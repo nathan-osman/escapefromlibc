@@ -45,7 +45,7 @@ var WgetCommand = cli.Command{
 				util.AbortWithError(err)
 			}
 			if u.Path == "" {
-				outFilename = "index"
+				outFilename = "index.html"
 			} else {
 				outFilename = path.Base(u.Path)
 			}

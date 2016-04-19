@@ -3,12 +3,15 @@ package net
 import (
 	"github.com/codegangsta/cli"
 	"github.com/nathan-osman/escapefromlibc/util"
+	"gopkg.in/cheggaaa/pb.v1"
 
 	"errors"
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"path"
+	"time"
 )
 
 var WgetCommand = cli.Command{
@@ -41,7 +44,7 @@ var WgetCommand = cli.Command{
 			if err != nil {
 				util.AbortWithError(err)
 			}
-			if u.RawPath == "" {
+			if u.Path == "" {
 				outFilename = "index"
 			} else {
 				outFilename = path.Base(u.Path)
@@ -64,14 +67,21 @@ var WgetCommand = cli.Command{
 			util.AbortWithError(err)
 		}
 
+		// Prepare to show download progress
+		bar := pb.New64(resp.ContentLength).SetUnits(pb.U_BYTES)
+		bar.Output = os.Stderr
+		bar.SetRefreshRate(500 * time.Millisecond)
+		bar.ShowSpeed = true
+		bar.Start()
+		reader := bar.NewProxyReader(resp.Body)
+
 		// Download the response body, copying it to the output file
-		_, err = io.Copy(out, resp.Body)
+		_, err = io.Copy(out, reader)
 		if err != nil {
 			util.AbortWithError(err)
 		}
-		resp.Body.Close()
 
-		// Indicate success
-		util.Output("Done!")
+		resp.Body.Close()
+		bar.FinishPrint("Done!")
 	},
 }

@@ -20,13 +20,17 @@ var WgetCommand = cli.Command{
 	ArgsUsage: "URI",
 	Flags: []cli.Flag{
 		cli.StringFlag{
-			Name:  "O",
-			Usage: "output file ('-' for STDIN)",
-		},
-		cli.StringFlag{
 			Name:  "method",
 			Value: "GET",
 			Usage: "HTTP method",
+		},
+		cli.StringFlag{
+			Name:  "O",
+			Usage: "output file ('-' for STDIN)",
+		},
+		cli.BoolFlag{
+			Name:  "quiet, q",
+			Usage: "supress output",
 		},
 	},
 	Action: func(c *cli.Context) {
@@ -67,21 +71,30 @@ var WgetCommand = cli.Command{
 			util.AbortWithError(err)
 		}
 
-		// Prepare to show download progress
-		bar := pb.New64(resp.ContentLength).SetUnits(pb.U_BYTES)
-		bar.Output = os.Stderr
-		bar.SetRefreshRate(500 * time.Millisecond)
-		bar.ShowSpeed = true
-		bar.Start()
-		reader := bar.NewProxyReader(resp.Body)
+		// In keeping with wget behavior, check the response code
+		if resp.StatusCode >= 400 {
+			util.AbortWithError(errors.New(resp.Status))
+		}
+
+		in := io.Reader(resp.Body)
+
+		// Show download progress if not surpressed
+		if !c.Bool("quiet") {
+			bar := pb.New64(resp.ContentLength).SetUnits(pb.U_BYTES)
+			bar.Output = os.Stderr
+			bar.SetRefreshRate(500 * time.Millisecond)
+			bar.ShowSpeed = true
+			bar.Start()
+			in = bar.NewProxyReader(in)
+		}
 
 		// Download the response body, copying it to the output file
-		_, err = io.Copy(out, reader)
+		_, err = io.Copy(out, in)
 		if err != nil {
 			util.AbortWithError(err)
 		}
 
+		// Be tidy
 		resp.Body.Close()
-		bar.FinishPrint("Done!")
 	},
 }

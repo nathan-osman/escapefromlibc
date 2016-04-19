@@ -9,7 +9,7 @@ Oops. An extra space caused the command to wipe `/lib`. Restoring the contents o
     # mkdir /something
     mkdir: error while loading shared libraries: libc.so.6
     # vi something.txt
-    mkdir: error while loading shared libraries: libc.so.6
+    vi: error while loading shared libraries: libc.so.6
 
 How do we fix this mess? If you installed escapefromlibc, you can breathe a sigh of relief. This handly little utility provides enough functionality to get you back on your feet.
 

@@ -19,5 +19,8 @@ How do we fix this mess? If you installed escapefromlibc, you can breathe a sigh
 
 escapefromlibc accomplishes all of this _without a dependency on libc_. It uses kernel syscalls directly to work its magic and restore your system to working order.
 
-### TODO: work in progress
-    
+### Building elc
+
+In order to ensure that elc is not linked against any shared libraries, it is necessary to set the following environment variable when building:
+
+    CGO_ENABLED=0   

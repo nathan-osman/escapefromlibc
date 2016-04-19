@@ -17,6 +17,7 @@ import (
 var WgetCommand = cli.Command{
 	Name:      "wget",
 	Usage:     "retrieve remote documents via HTTP",
+	Category:  "net",
 	ArgsUsage: "URI",
 	Flags: []cli.Flag{
 		cli.StringFlag{

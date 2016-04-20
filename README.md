@@ -21,6 +21,6 @@ escapefromlibc accomplishes all of this _without a dependency on libc_. It uses 
 
 ### Building elc
 
-In order to ensure that elc is not linked against any shared libraries, it is necessary to set the following environment variable when building:
+Build elc is as simple as:
 
-    CGO_ENABLED=0   
+    make

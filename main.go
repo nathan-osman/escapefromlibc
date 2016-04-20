@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/codegangsta/cli"
+	"github.com/nathan-osman/escapefromlibc/command/file"
 	"github.com/nathan-osman/escapefromlibc/command/net"
 
 	"os"
@@ -19,6 +20,7 @@ func main() {
 		},
 	}
 	app.Commands = []cli.Command{
+		file.CpCommand,
 		net.WgetCommand,
 	}
 	app.Writer = os.Stderr

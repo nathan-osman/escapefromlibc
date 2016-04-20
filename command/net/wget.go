@@ -71,6 +71,7 @@ var WgetCommand = cli.Command{
 		if err != nil {
 			util.AbortWithError(err)
 		}
+		defer resp.Body.Close()
 
 		// In keeping with wget behavior, check the response code
 		if resp.StatusCode >= 400 {
@@ -94,8 +95,5 @@ var WgetCommand = cli.Command{
 		if err != nil {
 			util.AbortWithError(err)
 		}
-
-		// Be tidy
-		resp.Body.Close()
 	},
 }

@@ -1,4 +1,7 @@
 UPX=$(shell which upx >/dev/null; echo $$?)
+ifneq ($(UPX), 0)
+$(error "UPX binary is missing")
+endif
 
 all: upx
 
@@ -10,12 +13,15 @@ elc: depends
 	$(info Building elc binary...)
 	@CGO_ENABLED=0 go build -o elc
 
-upx: elc
-ifeq ($(UPX), 0)
-		$(info Running goupx...)
-		@goupx elc
-else
-		$(warning Please install UPX to enable compression)
-endif
+$(GOPATH)/bin/goupx:
+	$(info Building goupx...)
+	@go get github.com/pwaller/goupx
 
-.PHONY: depends upx
+upx: elc $(GOPATH)/bin/goupx
+	$(info Running goupx...)
+	@$(GOPATH)/bin/goupx elc
+
+clean:
+	@rm elc
+
+.PHONY: depends upx clean
